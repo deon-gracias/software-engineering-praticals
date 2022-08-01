@@ -2,11 +2,20 @@ import java.io.*;
 import java.util.*;
 
 public class Courses {
-  public String[] courses, times;
-  public Vector<Vector<String>> preferences = new Vector<Vector<String>>();
-  public HashMap<String, Integer> rooms = new HashMap<String, Integer>();
+  protected String[] courses;
 
-  // Courses Constructor : requires input files
+  protected HashSet<String> timings = new HashSet<String>();
+
+  // [Course, Enrollment, Preferences]
+  protected Vector<Vector<String>> preferences = new Vector<Vector<String>>();
+
+  // Course -> Capacity
+  protected HashMap<String, Integer> rooms = new HashMap<String, Integer>();
+
+  // Time -> Course
+  protected HashMap<String, String> table = new HashMap<String, String>();
+
+  // Courses Constructor : requires 2 input files path
   public Courses(String file1, String file2) {
     String section;
 
@@ -37,6 +46,8 @@ public class Courses {
       // Read Preferences
       this.readPreferences(scan);
 
+      this.schedule();
+
       scan.close();
     } catch (IOException e) {
       // Error Handling
@@ -44,9 +55,68 @@ public class Courses {
     }
   }
 
-  public void readRooms(Scanner scan) {
+  // Schedule the Courses
+  protected void schedule() {
+    String[] prefsList;
+    String course, availableTiming;
+    HashSet<String> tempTimes = (HashSet<String>) timings.clone();
+
+    for (Vector<String> row : this.preferences) {
+      // Get course name
+      course = row.get(0);
+
+      // Check if row has preference
+      if (row.size() > 2) {
+        // Split preference timings
+        prefsList = row.get(2).split(",");
+
+        // Check for available time according to preference
+        availableTiming = getAvailable(prefsList);
+
+        // Check if available course in found
+        if (availableTiming.equals("")) {
+          System.out.println("Couldn't find suitable allotment according to preferred timing for " + availableTiming);
+          return;
+        }
+
+        // Allot timing for available course
+        tempTimes.remove(availableTiming);
+        this.table.put(availableTiming, course);
+      
+      } else {
+
+        // Check if sufficient timings are available
+        if (tempTimes.size() < 1) {
+          System.out.println("Insufficient timings for alloted courses");
+          return;
+        }
+
+        // Get first available timing
+        availableTiming = tempTimes.iterator().next();
+
+        // Assign timings
+        tempTimes.remove(availableTiming);
+        this.table.put(availableTiming, course);
+      }
+    }
+    
+  }
+
+  protected String getAvailable(String[] prefsList) {
+    // Search for available timing
+    for (int i = 0; i < prefsList.length; i++) {
+      // Found available timing
+      if (!this.table.containsKey(prefsList[i])) return prefsList[i];
+    }
+
+    // Couldn't find preferred timing
+    return "";
+  }
+
+  // Read Rooms from File
+  protected void readRooms(Scanner scan) {
     String str;
-    Boolean exit = false;
+    boolean exit = false;
 
     do {
       // Read line
@@ -68,7 +138,8 @@ public class Courses {
 
   }
 
-  public void readCourses(Scanner scan) {
+  // Read Courses from File
+  protected void readCourses(Scanner scan) {
     String str;
 
     // Get line with list of courses
@@ -81,7 +152,8 @@ public class Courses {
     courses = str.split(",");
   }
 
-  public void readTimes(Scanner scan) {
+  // Read Times from File
+  protected void readTimes(Scanner scan) {
     String str;
 
     // Get line with list of times
@@ -91,11 +163,15 @@ public class Courses {
     str = str.replace(";", "").replace(" ", "");
 
     // Split elements by ,
-    times = str.split(",");
+    timings = new HashSet<String>(Arrays.asList(str.split(",")));
   }
 
-  public void readPreferences(Scanner scan) {
+  // Read Preferences from File
+  protected void readPreferences(Scanner scan) {
     String str;
+
+    // Skip First Line
+    scan.nextLine();
 
     while (scan.hasNextLine()) {
       str = scan.nextLine();
@@ -113,15 +189,21 @@ public class Courses {
 
   // Debugging
   public void printData() {
-    System.out.println(rooms);
+    System.out.println("Rooms\n" + rooms);
 
+    System.out.println("\nCourses");
     for (String course : courses)
-      System.out.println(course);
+      System.out.print(course + ",");
 
-    for (String time : times)
-      System.out.println(time);
+    System.out.println("\n\nTimings");
+    for (String time : timings)
+      System.out.print(time + ",");
 
+    System.out.println("\n\nPreferences");
     for (Vector<String> prefs : preferences)
-      System.out.println(prefs);
+      System.out.print(prefs + ",");
+
+    System.out.println("\n\nResult");
+    System.out.println(table);
   }
 }
