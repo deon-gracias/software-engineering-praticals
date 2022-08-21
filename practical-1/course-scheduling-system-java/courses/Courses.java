@@ -65,7 +65,7 @@ public class Courses {
     try {
       FileWriter outputFile = new FileWriter("outputs/output.txt");
   
-      outputFile.write("Course\t\tRoom\t\t\t\tTiming\n");
+      outputFile.write("Course\t\tRoom\t\t\tTiming\n");
       for (Entry<String, String> entry : this.courseTimings.entrySet()) {
         String course = entry.getValue();
         String timing = entry.getKey();
