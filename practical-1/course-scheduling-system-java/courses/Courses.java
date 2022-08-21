@@ -1,5 +1,6 @@
 import java.io.*;
 import java.util.*;
+import java.util.Map.*;
 
 public class Courses {
   protected String[] courses;
@@ -9,11 +10,14 @@ public class Courses {
   // [Course, Enrollment, Preferences]
   protected Vector<Vector<String>> preferences = new Vector<Vector<String>>();
 
-  // Course -> Capacity
+  // Room -> Capacity
   protected HashMap<String, Integer> rooms = new HashMap<String, Integer>();
 
   // Time -> Course
-  protected HashMap<String, String> table = new HashMap<String, String>();
+  protected HashMap<String, String> courseTimings = new HashMap<String, String>();
+  
+  // Course -> Room
+  protected HashMap<String, Integer> courseRooms = new HashMap<String, Integer>();
 
   // Courses Constructor : requires 2 input files path
   public Courses(String file1, String file2) {
@@ -46,6 +50,7 @@ public class Courses {
       // Read Preferences
       this.readPreferences(scan);
 
+      // Schedule Courses
       this.schedule();
 
       scan.close();
@@ -55,15 +60,71 @@ public class Courses {
     }
   }
 
+  // Output Result into File
+  protected void outputFile() {
+    try {
+      FileWriter outputFile = new FileWriter("outputs/output.txt");
+  
+      outputFile.write("Course\t\tRoom\t\t\t\tTiming\n");
+      for (Entry<String, String> entry : this.courseTimings.entrySet()) {
+        String course = entry.getValue();
+        String timing = entry.getKey();
+        Integer room = (this.courseRooms.get(course));
+        outputFile.write(course + "\t\t\t" + room + "\t\t\t" + timing + "\n");
+      }
+
+      outputFile.close();
+    } catch(IOException io) {
+      System.out.println("IOException occured");
+    }
+  }
+  
+  // Output Result into File
+  protected void outputFileCsv() {
+    try {
+      FileWriter outputFileCsv = new FileWriter("outputs/output.csv");
+  
+      outputFileCsv.write("Course,Room,Timing\n");
+      for (Entry<String, String> entry : this.courseTimings.entrySet()) {
+        String course = entry.getValue();
+        String timing = entry.getKey();
+        Integer room = (this.courseRooms.get(course));
+        outputFileCsv.write(course + "," + room + "," + timing + "\n");
+      }
+
+      outputFileCsv.close();
+    } catch(IOException io) {
+      System.out.println("IOException occured");
+    }
+  }
+
   // Schedule the Courses
   protected void schedule() {
     String[] prefsList;
     String course, availableTiming;
+    boolean foundRoom = false;
+    int enrollmentDiff = Integer.MAX_VALUE;
     HashSet<String> tempTimes = (HashSet<String>) timings.clone();
 
     for (Vector<String> row : this.preferences) {
       // Get course name
       course = row.get(0);
+
+      // Find Suitable Room for Coures
+      for (Entry<String, Integer> entry : this.rooms.entrySet()) {
+        int enrollment = Integer.parseInt(row.get(1));
+        
+        if (entry.getValue() >= enrollment && enrollmentDiff > entry.getValue() - enrollment) {
+          foundRoom = true;
+          this.courseRooms.put(course, Integer.parseInt(entry.getKey().strip()));
+        }
+      }
+
+      // Room not found
+      if (!foundRoom) {
+        System.out.println("Couldn't find room for course");
+        return;
+      }
 
       // Check if row has preference
       if (row.size() > 2) {
@@ -75,14 +136,13 @@ public class Courses {
 
         // Check if available course in found
         if (availableTiming.equals("")) {
-          System.out.println("Couldn't find suitable allotment according to preferred timing for " + availableTiming);
+          System.out.println("Couldn't find suicourseTimings allotment according to preferred timing for " + availableTiming);
           return;
         }
 
         // Allot timing for available course
         tempTimes.remove(availableTiming);
-        this.table.put(availableTiming, course);
-      
+        this.courseTimings.put(availableTiming, course);
       } else {
 
         // Check if sufficient timings are available
@@ -96,17 +156,20 @@ public class Courses {
 
         // Assign timings
         tempTimes.remove(availableTiming);
-        this.table.put(availableTiming, course);
+        this.courseTimings.put(availableTiming, course);
       }
     }
-    
   }
 
+  // Get available timings
   protected String getAvailable(String[] prefsList) {
     // Search for available timing
     for (int i = 0; i < prefsList.length; i++) {
       // Found available timing
-      if (!this.table.containsKey(prefsList[i])) return prefsList[i];
+      if (!this.courseTimings.containsKey(prefsList[i]))
+
+        // Cour
+        return prefsList[i];
     }
 
     // Couldn't find preferred timing
@@ -193,17 +256,19 @@ public class Courses {
 
     System.out.println("\nCourses");
     for (String course : courses)
-      System.out.print(course + ",");
+      System.out.print("\"" + course + "\"" + ", ");
 
     System.out.println("\n\nTimings");
     for (String time : timings)
-      System.out.print(time + ",");
+      System.out.print("\"" + time + "\"" + ", ");
 
     System.out.println("\n\nPreferences");
     for (Vector<String> prefs : preferences)
       System.out.print(prefs + ",");
 
     System.out.println("\n\nResult");
-    System.out.println(table);
+    System.out.println(courseTimings);
+
+    // Cour
   }
 }
