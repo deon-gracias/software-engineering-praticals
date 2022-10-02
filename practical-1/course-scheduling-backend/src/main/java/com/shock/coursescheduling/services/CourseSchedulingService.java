@@ -105,7 +105,6 @@ public class CourseSchedulingService {
     }
 
     private static HashMap<String, String[]> makeCoursewiseRoom(HashMap<String,String> courseRooms, HashMap<String, String> courseTimings, String course) {
-//        HashMap<String, String[]> courseRooms = new HashMap<String, String[]>() ;
         String[] dayTime = new String[2];
 
         String[] roomTime = new String[2];
@@ -114,27 +113,19 @@ public class CourseSchedulingService {
         Vector<String> rooms = new Vector<>();
 
         for (Map.Entry<String, String> entry : courseRooms.entrySet()) {
-//            System.out.println(entry.getKey());
             if (Objects.equals(entry.getKey(), course)) {
-//                System.out.println("here");
                 rooms.add(entry.getValue());
             }
         }
-//        System.out.println(rooms);
-//        System.out.println(course);
-//        System.out.println(courseTimings);
 
         for (Map.Entry<String, String> entry : courseTimings.entrySet()) {
             if (Objects.equals(entry.getValue(), course)) {
-//                System.out.println("here again");
                 tempTime = entry.getKey();
                 dayTime = tempTime.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)", 2);
                 roomTime = new String[]{String.valueOf(rooms.get(0)), dayTime[1]};
                 String[] days = dayTime[0].split("");
-//                System.out.println(Arrays.toString(days));
                 for (int i = 0; i < days.length; i++) {
                     dayCourse.put(days[i], roomTime);
-//                        System.out.println(Arrays.toString(roomTime));
                 }
             }
         }
