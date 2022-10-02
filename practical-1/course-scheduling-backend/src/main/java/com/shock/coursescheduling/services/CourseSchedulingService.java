@@ -76,9 +76,14 @@ public class CourseSchedulingService {
         }
 
         // Course wise
-        HashMap<String, HashMap<String, String[]>> courseWise;
+        HashMap<String, HashMap<String, String[]>> courseWise = new HashMap<>();
 
-        return new ScheduledCourseModel(courseRooms, courseTimings, roomWise, );
+        for (Map.Entry<String, String> courseEntry : courseRooms.entrySet()) {
+            HashMap<String, String[]> courseData = makeCoursewiseRoom(courseRooms, courseTimings, courseEntry.getKey());
+            courseWise.put(courseEntry.getKey(), courseData);
+        }
+
+        return new ScheduledCourseModel(courseRooms, courseTimings, roomWise, courseWise);
     }
 
     private static HashMap<String, String[]> makeRoomwiseCourses(HashMap<String,String> courseRooms, HashMap<String, String> courseTimings, String room) {
@@ -100,15 +105,15 @@ public class CourseSchedulingService {
     }
 
     private static HashMap<String, String[]> makeCoursewiseRoom(HashMap<String,String> courseRooms, HashMap<String, String> courseTimings, String course) {
-        HashMap<String, String[]> courseRooms = new HashMap<String, String[]>() ;
+//        HashMap<String, String[]> courseRooms = new HashMap<String, String[]>() ;
         String[] dayTime = new String[2];
 
         String[] roomTime = new String[2];
         String tempTime;
-        HashMap<String, String> dayCourse = new HashMap<String, String>();
-        Vector<Integer> rooms = new Vector<>();
+        HashMap<String, String[]> dayCourse = new HashMap<String, String[]>();
+        Vector<String> rooms = new Vector<>();
 
-        for (Map.Entry<String, String[]> entry : courseRooms.entrySet()) {
+        for (Map.Entry<String, String> entry : courseRooms.entrySet()) {
 //            System.out.println(entry.getKey());
             if (Objects.equals(entry.getKey(), course)) {
 //                System.out.println("here");
@@ -128,7 +133,7 @@ public class CourseSchedulingService {
                 String[] days = dayTime[0].split("");
 //                System.out.println(Arrays.toString(days));
                 for (int i = 0; i < days.length; i++) {
-                    dayCourse.put(days[i], Arrays.toString(roomTime));
+                    dayCourse.put(days[i], roomTime);
 //                        System.out.println(Arrays.toString(roomTime));
                 }
             }

@@ -12,5 +12,5 @@ public class ScheduledCourseModel {
     private HashMap<String, String> rooms;
     private HashMap<String, String> times;
     private HashMap<String, HashMap<String, String[]>> roomWise;
-//    private HashMap<String, HashMap<String, String[]>> courseWise;
+    private HashMap<String, HashMap<String, String[]>> courseWise;
 }

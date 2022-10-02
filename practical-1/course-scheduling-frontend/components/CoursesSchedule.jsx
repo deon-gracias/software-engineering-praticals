@@ -14,12 +14,11 @@ export default function CoursesSchedule({
   schedule,
   removeBack,
 }) {
-  //   console.log(typeof schedule);
 
   const views = [
     { name: "Standard", component: <StandardView schedule={schedule} /> },
     { name: "Rooms", component: <RoomView schedule={schedule} /> },
-    { name: "Courses", component: <></> },
+    { name: "Courses", component: <CourseView schedule={schedule} /> },
   ];
 
   return (
@@ -79,38 +78,66 @@ function StandardView({ schedule }) {
 }
 
 function RoomView({ schedule }) {
-  console.log(schedule.roomWise);
-
   return (
-    <>
-      {Object.entries(schedule.roomWise).map(([room, course]) => (
-        <Box sx={{ padding: "1rem" }}>
-          <Title ml={"0.5rem"} order={4}>
-            Room {room}
-          </Title>
-          <Table>
-            <thead>
+    Object.entries(schedule.roomWise).map(([room, course]) => (
+      <Box sx={{ padding: "1rem" }}>
+        <Title ml={"0.5rem"} order={4}>
+          Room {room}
+        </Title>
+        <Table>
+          <thead>
+            <tr>
+              <th>Course</th>
+              <th>Day</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(course).map(([key, value]) => (
               <tr>
-                <th>Course</th>
-                <th>Day</th>
-                <th>Time</th>
+                <td>{key}</td>
+                <td>{letterToDay(value[0])}</td>
+                <td>
+                  {value[1]} {parseInt(value[1].split(":")) > 9 ? "am" : "pm"}
+                </td>
               </tr>
-            </thead>
-            <tbody>
-              {Object.entries(course).map(([key, value]) => (
-                <tr>
-                  <td>{key}</td>
-                  <td>{letterToDay(value[0])}</td>
-                  <td>
-                    {value[1]} {parseInt(value[1].split(":")) > 9 ? "am" : "pm"}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </Box>
-      ))}
-    </>
+            ))}
+          </tbody>
+        </Table>
+      </Box>
+    ))
+  );
+}
+
+function CourseView({ schedule }) {
+  return (
+    schedule.courseWise !== undefined && Object.entries(schedule.courseWise).map(([course, room]) => (
+      <Box sx={{ padding: "1rem" }}>
+        <Title ml={"0.5rem"} order={4}>
+          Course {course}
+        </Title>
+        <Table>
+          <thead>
+            <tr>
+              <th>Room</th>
+              <th>Day</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.entries(room).map(([key, value]) => (
+              <tr>
+                <td>{key}</td>
+                <td>{letterToDay(value[0])}</td>
+                <td>
+                  {value[1]} {parseInt(value[1].split(":")) > 9 ? "am" : "pm"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Box>
+    ))
   );
 }
 
