@@ -139,14 +139,14 @@ export default function CoursesForm({ setSchedule }) {
       <Grid grow>
         {courses.map((course, index) => (
           <React.Fragment key={`course-${index}`}>
-            <Grid.Col span={5}>
+            <Grid.Col span={4}>
               <Input
                 placeholder="Course Name"
                 onChange={(e) => updateCourse(index, e.target.value, null)}
                 value={course.name}
               ></Input>
             </Grid.Col>
-            <Grid.Col span={5}>
+            <Grid.Col span={4}>
               <NumberInput
                 placeholder="Enrolled"
                 onChange={(e) => updateCourse(index, null, e)}
