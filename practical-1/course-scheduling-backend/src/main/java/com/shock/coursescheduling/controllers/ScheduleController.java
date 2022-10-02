@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 public class ScheduleController {
 
-    @GetMapping("/schedule")
-    public ResponseEntity<String> getSchedule() {
-        return new ResponseEntity<>("Response", HttpStatus.OK);
-    }
+//    @GetMapping("/schedule") public ResponseEntity<String> getSchedule() {
+//        return new ResponseEntity<>("Response", HttpStatus.OK);
+//    }
 
     @PostMapping("/schedule")
     public ResponseEntity<Object> schedule(@RequestBody RequestCourses req) {
